@@ -127,6 +127,7 @@
     <Compile Include="Mods\Mod_Fix_AI_Tethers.cs" />
     <Compile Include="Mods\Mod_Fix_AI_TowerEngines.cs" />
     <Compile Include="Mods\Mod_Fix_FireBallista.cs" />
+    <Compile Include="Mods\Mod_Change_Other_AddCustomSFX.cs" />
     <Compile Include="Patching\BinElements\BinCode.cs" />
     <Compile Include="Patching\BinElements\BinCollection.cs" />
     <Compile Include="Patching\BinElements\Referencers\BinAddress.cs" />
@@ -202,6 +203,7 @@
     <EmbeddedResource Include="CodeBlocks\o_playercolor_ai_video_message_shield.block" />
     <EmbeddedResource Include="CodeBlocks\o_playercolor_ai_video_message_shield_enemy_taunt.block" />
     <EmbeddedResource Include="CodeBlocks\o_playercolor_ai_video_message_shield_pre.block" />
+    <EmbeddedResource Include="CodeBlocks\o_add_custom_speech_sfx.block" />
     <EmbeddedResource Include="CodeBlocks\ui_fix_laddermen_cost_display_in_engineers_guild.block" />
     <EmbeddedResource Include="CodeBlocks\o_armory_marketplace_weapon_order_fix1.block" />
     <EmbeddedResource Include="CodeBlocks\o_armory_marketplace_weapon_order_fix2.block" />

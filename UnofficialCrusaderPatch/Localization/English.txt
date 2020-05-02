@@ -921,3 +921,13 @@ aiv_evreyfixed_descr
 	"Fixes bugs of the vanilla AI-Lord castles, like missing houses and guilds &
 or blocked entrances. [Created by Evrey](https://github.com/Evrey/SHC_AIV/)"
 }
+
+o_add_custom_speech_sfx
+{
+    "Add custom SFX list."
+}
+
+o_add_custom_speech_sfx_descr
+{
+    "Adds custom SFX list."
+}
