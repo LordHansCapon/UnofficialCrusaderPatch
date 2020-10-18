@@ -1338,7 +1338,7 @@ namespace UCP
              *  WASD
              */
              
-            new Change("o_keys", ChangeType.Other, false)
+            new Change("o_keys", ChangeType.Other, false, false)
             {
                 new DefaultHeader("o_keys")
                 {
@@ -1360,7 +1360,7 @@ namespace UCP
                             0xE8, new BinRefTo("func"), // call func
                             0xE9, new BinRefTo("savefunc"), // jmp to save
                         }
-                    },    
+                    },
 
                     // 004697C0
                     new BinaryEdit("o_keys_savename")
@@ -1515,7 +1515,87 @@ namespace UCP
                             0xE8, new BinRefTo("callleft")
                         }
                     }
+                },
+                
+                new SliderHeader("o_autosave", false, 1, 300, 1, 15, 15) // in minutes
+                {   
+                    // 495800
+                    new BinaryEdit("o_keys_savefunc")
+                    {
+                        new BinAddress("self", 17),
+                        new BinAddress("c1", 22),
+                        new BinAddress("func", 27, true),
+                        new BinAddress("savefunc", 50, true),
+
+                        // 0x20 == save, 0x1F == load
+                        new BinAlloc("DoSave", null)
+                        {
+                            0x8B, 0x44, 0x24, 0x04, // mov eax, [esp+4]
+                            0xA3, new BinRefTo("c1", false), // mov [c1], eax
+                            0xB9, new BinRefTo("self", false), // mov ecx, self
+                            0x6A, 0x0E, // push E
+                            0xE8, new BinRefTo("func"), // call func
+                            0xE9, new BinRefTo("savefunc"), // jmp to save
+                        }
+                    },
+                    
+                    // 4404A0
+                    new BinaryEdit("o_autosave_gametype")
+                    {
+                        new BinAddress("gametype", 18),
+                    },
+                    
+                    new BinaryEdit("o_autosave_timegettime")
+                    {
+                        new BinAddress("winmm.timeGetTime", 2)
+                    },
+                    
+                    // 45d049
+                    new BinaryEdit("o_autosave")
+                    {
+                        new BinAlloc("autosaveInterval", 4)
+                        {
+                            new BinInt32Value(6000) // convert minutes to milliseconds
+                        },
+                        new BinAlloc("autosaveTime", 4),
+                        
+                        new BinSkip(337), // huge skip
+                        
+                        new BinAddress("originalFnAddress", 1, true),
+                        
+                        new BinHook(7)
+                        {
+                            // original bit
+                            0xE8, new BinRefTo("originalFnAddress"), // call original function
+                            0x8B, 0xCE, // mov ecx,esi
+                            
+                            0x60, // pushad
+                            0x83, 0x3D, new BinRefTo("gametype", false), 0x03, // check gametype
+                            0x0F, 0x85, new BinRefTo("skipAutosave"),
+                            
+                            0xFF, 0x15, new BinRefTo("winmm.timeGetTime", false), // get time
+                            0x81, 0x3D, new BinRefTo("autosaveTime", false), 0x00, 0x00, 0x00, 0x00, // cmp [autosaveTime],00000000
+                            0x0F, 0x84, new BinRefTo("initAutosave"), // je initAutosave
+                            
+                            0x8B, 0x1D, new BinRefTo("autosaveTime", false), // mov ebx,[autosaveTime]
+                            0x8B, 0xC8, // mov ecx,eax
+                            0x29, 0xD9, // sub ecx,ebx
+                            0x3B, 0x0D, new BinRefTo("autosaveInterval", false), // cmp ecx,[autosaveInterval]
+                            0x0F, 0x8E, new BinRefTo("skipAutosave"), // jle skipAutosave
+                            
+                            0x6A, 0x20, // push 20
+                            0xE8, new BinRefTo("DoSave"),
+                            0x59, // pop ecx
+                            
+                            new BinLabel("initAutosave"),
+                            0xA3, new BinRefTo("autosaveTime", false),
+                            
+                            new BinLabel("skipAutosave"),
+                            0x61, // popad
+                        }
+                    },
                 }
+                
             },
             
             /*
